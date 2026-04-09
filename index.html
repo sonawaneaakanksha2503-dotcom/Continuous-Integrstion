@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tic Tac Toe</title>
+    <style>
+        .grid { display: grid; grid-template-columns: repeat(3, 100px); }
+        button { height: 100px; font-size: 30px; }
+    </style>
+</head>
+<body>
+
+<h2>Tic Tac Toe</h2>
+
+<div class="grid" id="board"></div>
+<button onclick="resetGame()">Reset</button>
+
+<script>
+let boardDiv = document.getElementById("board");
+
+function createBoard() {
+    boardDiv.innerHTML = "";
+    for(let i=0;i<9;i++){
+        let btn = document.createElement("button");
+        btn.onclick = () => move(i);
+        boardDiv.appendChild(btn);
+    }
+}
+createBoard();
+
+function move(i){
+    fetch('/move',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({index:i})
+    })
+    .then(res=>res.json())
+    .then(data=>{
+        updateBoard(data.board);
+        if(data.winner){
+            alert(data.winner + " Wins!");
+        }
+    });
+}
+
+function updateBoard(board){
+    let buttons = document.querySelectorAll("button");
+    for(let i=0;i<9;i++){
+        buttons[i].innerText = board[i];
+    }
+}
+
+function resetGame(){
+    fetch('/reset').then(()=>createBoard());
+}
+</script>
+
+</body>
+</html>
